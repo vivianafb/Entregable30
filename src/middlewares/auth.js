@@ -1,6 +1,5 @@
 import passport from 'passport';
 import passportLocal from 'passport-local';
-import { UserModel } from '../models/user';
 import passportFacebook from 'passport-facebook';
 import config from '../config';
 

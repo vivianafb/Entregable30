@@ -6,18 +6,25 @@ import { isLoggedIn } from '../middlewares/auth';
 import { Argumentos } from "../middlewares/auth";
 import { fork } from 'child_process';
 import path from 'path';
-import randoms from '../utils/calculo.js';
 import os from 'os';
-import { portArg } from "../middlewares/args";
+import data from '../data';
+
+import {logger}  from '../utils/logs'
+
 const router = Router();
 
 router.use('/productos',productoRouter);
 
-router.get('/', (req, res) => {
-  res.json({
-    pid: process.pid,
-    msg: `HOLA desde puerto ${portArg}`,
-    });
+router.get('/data', (req, res) => {
+  res.send(data);
+
+});
+
+
+router.use('/muerte', (req, res) => {
+  res.json({ msg: 'OK' });
+  logger.error(`PID => ${process.pid} die`);
+  process.exit(0);
 });
 
 router.get('/info', (req, res) => {
