@@ -1,11 +1,7 @@
+Entregable 31 rutas
 
-Entregable 30 Rutas:
+/data : http://localhost:8080/data
 
-Hay un archivo txt con la info de nginx.conf
+/muerte : http://localhost:8080/muerte
 
-
-
-/info : http://localhost/info
-
-/randoms : http://localhost/randoms?cant=30
 

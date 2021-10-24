@@ -16,9 +16,6 @@ export const randoms = (cant) => {
       const result = randoms(msg.cantidad);
       process.send(result);
       process.exit(0)
-  
-    //   if (process && process.send) {
-    //   }
     }
   });
   
