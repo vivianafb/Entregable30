@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.addMessage = exports.getAllMessages = void 0;
+exports.getAllMessages = exports.addMessage = void 0;
 
 var _dbSchema = require("./dbSchema");
 

@@ -9,19 +9,17 @@ var _express = require("express");
 
 var _productos = _interopRequireDefault(require("./productos"));
 
-var _user = _interopRequireDefault(require("./user"));
-
 var _auth = _interopRequireWildcard(require("../middlewares/auth"));
 
 var _child_process = require("child_process");
 
 var _path = _interopRequireDefault(require("path"));
 
-var _calculo = _interopRequireDefault(require("../utils/calculo.js"));
-
 var _os = _interopRequireDefault(require("os"));
 
-var _args = require("../middlewares/args");
+var _data = _interopRequireDefault(require("../data"));
+
+var _logs = require("../utils/logs");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
@@ -29,14 +27,39 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// import userRouter from './user';
 const router = (0, _express.Router)();
 router.use('/productos', _productos.default);
-router.get('/', (req, res) => {
-  res.json({
-    pid: process.pid,
-    msg: `HOLA desde puerto ${_args.portArg}`
-  });
+router.get('/data', (req, res) => {
+  res.send(_data.default);
 });
+router.use('/muerte', (req, res) => {
+  res.json({
+    msg: 'OK'
+  });
+
+  _logs.logger.error(`PID => ${process.pid} die`);
+
+  process.exit(0);
+}); // CON CONSOLE.LOG
+// router.get('/info', (req, res) => {
+//   const info ={
+//     'Argumentos de entrada': Argumentos,
+//     'Nombre de la plataforma': process.platform,
+//     'Versión de node.js': process.version,
+//     'Uso de memoria': process.memoryUsage(),
+//     'Path de ejecución': process.cwd(),
+//     'Process id': process.pid,
+//     'Carpeta corriente': process.execPath,
+//     'Numero de procesadores': os.cpus().length
+//   }
+//   console.log(info);
+//   res.json({ 
+//     data: info
+//   })
+// });
+//SIN CONSOLE.LOG
+
 router.get('/info', (req, res) => {
   res.json({
     'Argumentos de entrada': _auth.Argumentos,
@@ -55,7 +78,8 @@ const scriptPath = _path.default.resolve(__dirname, '../utils/calculo.js');
 router.get('/randoms', (req, res) => {
   let num;
   req.query.cant ? num = Number(req.query.cant) : 100000000;
-  const computo = (0, _child_process.fork)(scriptPath);
+  const computo = (0, _child_process.fork)(scriptPath); // const computo = scriptPath;
+
   const msg = {
     msg: 'start',
     cantidad: num
@@ -132,7 +156,7 @@ router.post('/signup', (req, res, next) => {
     if (!user) return res.render('registererr');
     res.render('inicio');
   })(req, res, next);
-});
-router.use('/users', _auth.isLoggedIn, _user.default);
+}); // router.use('/users', isLoggedIn, userRouter);
+
 var _default = router;
 exports.default = _default;

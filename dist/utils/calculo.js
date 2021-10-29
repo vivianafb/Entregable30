@@ -27,7 +27,6 @@ process.on('message', msg => {
     console.log('Start calculo');
     const result = randoms(msg.cantidad);
     process.send(result);
-    process.exit(0); //   if (process && process.send) {
-    //   }
+    process.exit(0);
   }
 });

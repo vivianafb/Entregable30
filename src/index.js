@@ -1,18 +1,19 @@
 import express from 'express';
-import apiRouter from './routes/index'
+import apiRouter from './routes/index';
 import * as http from 'http';
-import { portArg } from './middlewares/args'
+import { portArg, ClusterArgument } from './middlewares/args';
 import os from 'os';
 import cluster from 'cluster';
 import compression from 'compression';
-import {logger}  from './utils/logs'
+import {logger}  from './utils/logs';
 
 const app = express();
-
+const clusterMode = ClusterArgument;
 
 const server = http.Server(app);
 const numCPUs = os.cpus().length;
-if (cluster.isMaster) {
+
+if (clusterMode && cluster.isMaster) {
   logger.info(`NUMERO DE CPUS ===> ${numCPUs}`);
   logger.info(`PID MASTER ${process.pid}`);
 

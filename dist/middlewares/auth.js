@@ -3,13 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = exports.isLoggedIn = void 0;
+exports.isLoggedIn = exports.default = void 0;
 
 var _passport = _interopRequireDefault(require("passport"));
 
 var _passportLocal = _interopRequireDefault(require("passport-local"));
-
-var _user = require("../models/user");
 
 var _passportFacebook = _interopRequireDefault(require("passport-facebook"));
 

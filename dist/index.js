@@ -4,25 +4,7 @@ var _express = _interopRequireDefault(require("express"));
 
 var _index = _interopRequireDefault(require("./routes/index"));
 
-var _expressHandlebars = _interopRequireDefault(require("express-handlebars"));
-
-var _path = _interopRequireDefault(require("path"));
-
 var http = _interopRequireWildcard(require("http"));
-
-var _socket = require("./services/socket");
-
-var _config = _interopRequireDefault(require("./config"));
-
-var _db = require("./services/db");
-
-var _expressSession = _interopRequireDefault(require("express-session"));
-
-var _cookieParser = _interopRequireDefault(require("cookie-parser"));
-
-var _server = require("./services/server.js");
-
-var _auth = _interopRequireDefault(require("./middlewares/auth"));
 
 var _args = require("./middlewares/args");
 
@@ -32,7 +14,7 @@ var _cluster = _interopRequireDefault(require("cluster"));
 
 var _compression = _interopRequireDefault(require("compression"));
 
-var _serverCompress = _interopRequireDefault(require("./services/serverCompress"));
+var _logs = require("./utils/logs");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
@@ -40,74 +22,35 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// serverCompress.listen(portArg, () =>
-//   console.log(`Servidor Compress escuchando en puerto 8080`)
-// );
-// const puerto =  Config.PORT;
-const app = (0, _express.default)(); // connectToDB();
-
+const app = (0, _express.default)();
+const clusterMode = _args.ClusterArgument;
 const server = http.Server(app);
 
 const numCPUs = _os.default.cpus().length;
 
-if (_cluster.default.isMaster) {
-  console.log(`NUMERO DE CPUS ===> ${numCPUs}`);
-  console.log(`PID MASTER ${process.pid}`);
+if (clusterMode && _cluster.default.isMaster) {
+  _logs.logger.info(`NUMERO DE CPUS ===> ${numCPUs}`);
+
+  _logs.logger.info(`PID MASTER ${process.pid}`);
 
   for (let i = 0; i < numCPUs; i++) {
     _cluster.default.fork();
   }
 
   _cluster.default.on('exit', worker => {
-    console.log(`Worker ${worker.process.pid} died at ${Date()}`);
+    _logs.logger.warn(`Worker ${worker.process.pid} died at ${Date()}`);
 
     _cluster.default.fork();
   });
 } else {
-  _serverCompress.default.listen(_args.portArg, () => console.log(`Servidor express escuchando en el puerto ${_args.portArg} - PID WORKER ${process.pid}`));
-} // const myWSServer = initWsServer(server);
-// server.listen(portArg, () => console.log('Server up en puerto', portArg));
-// // const publicPath = path.resolve(__dirname, '../public');
-// // app.use(express.static(publicPath));
-// const layoutFolderPath = path.resolve(__dirname, '../views/layouts');
-// const defaultLayerPth = path.resolve(__dirname, '../views/layouts/index.hbs');
-// app.set('view engine', 'hbs');
-// app.engine(
-//   'hbs',
-//   handlebars({
-//     layoutsDir: layoutFolderPath,
-//     defaultLayout: defaultLayerPth,
-//     extname: 'hbs',
-//   })
-// );
-// const messages = [];
-// myWSServer.on('connection',  (socket) =>{
-//   // console.log('\nUn cliente se ha conectado');
-//     // console.log(`ID DEL SOCKET DEL CLIENTE => ${socket.client.id}`);
-//     // console.log(`ID DEL SOCKET DEL SERVER => ${socket.id}`);
-//   socket.on('new-message',  (data)=> {
-//     const newMessage = {
-//       message: data,
-//     };
-//     messages.push(newMessage);
-//     myWSServer.emit('messages', messages);
-//   });
-//   socket.on('askData', (data) => {
-//     console.log('ME LLEGO DATA');
-//     myWSServer.emit('messages', messages);
-//   });
-// });
-// const argumentos = process.argv;
-// console.log('ARGUMENTOS RECIBIDOS');
-// console.log(argumentos);
-
+  // const PORT = Config.PORT;
+  server.listen(_args.portArg, () => _logs.logger.info(`Servidor express escuchando en el puerto ${_args.portArg} - PID WORKER ${process.pid}`));
+  server.on('error', error => _logs.logger.error(`Error en el servidor: ${error}`));
+}
 
 app.use(_express.default.json());
 app.use(_express.default.urlencoded({
   extended: true
 }));
-app.use((0, _cookieParser.default)());
-app.use((0, _expressSession.default)(_server.StoreOptions));
-app.use(_auth.default.initialize());
-app.use(_auth.default.session());
+app.use((0, _compression.default)());
 app.use(_index.default);

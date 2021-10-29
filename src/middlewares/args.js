@@ -7,3 +7,4 @@ export const Argumentos = args;
 export const portArg = args.puerto || 8080;
 export const clientIdArg = args.clientId;
 export const clientSecretArgt = args.clientSecret;
+export const ClusterArgument = args.cluster;
